@@ -1,12 +1,8 @@
 # dockindock
 
-Docker image to run docker in docker. Now it includes an apache for
-forwarding requests from outside do contained docker instances.
-
-Configure Apache:
-  - Port 80 is exposed
-  - Use volume `/etc/apache2/sites-enabled` for your site configurations
-  - After changing configuration, `docker exec dockindock apache2ctl restart`
+Docker image to run docker in docker. Use mwaeckerlin/reverse-proxy
+for reverse proxy to forward requests from outside do contained docker
+instances.
 
 Note: The image must be started with option `--privileged`
 
