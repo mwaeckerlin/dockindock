@@ -1,4 +1,5 @@
-# dockindock
+Docker in Docker
+================
 
 Docker image to run docker in docker. Use mwaeckerlin/reverse-proxy
 for reverse proxy to forward requests from outside do contained docker
@@ -8,7 +9,7 @@ Note: The image must be started with option `--privileged`
 
 Build:
 
-    docker build --rm --force-rm -t dockindock .
+    docker build --rm --force-rm -t mwaeckerlin/dockindock .
 
 Run:
   1. run the docker container that contains sub docker containers:
