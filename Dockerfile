@@ -7,4 +7,3 @@ RUN apt-get update && apt-get install -y docker-ce lxc-docker- docker-engine- do
 
 VOLUME /var/lib/docker
 ADD start-dockindock.sh /start-dockindock.sh
-CMD /start-dockindock.sh -f
