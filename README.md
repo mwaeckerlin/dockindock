@@ -5,7 +5,7 @@ Docker image to run docker in docker. Use mwaeckerlin/reverse-proxy
 for reverse proxy to forward requests from outside do contained docker
 instances.
 
-Note: The image must be started with option `--privileged`
+Note: The image must either be started with option `--privileged` or with `-v /var/run/docker.sock:/var/run/docker.sock`.
 
 Build:
 
