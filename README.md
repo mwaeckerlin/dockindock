@@ -7,11 +7,14 @@ instances.
 
 Note: The image must either be started with option `--privileged` or with `-v /var/run/docker.sock:/var/run/docker.sock`.
 
+Prefered solution is to use `-v /var/run/docker.sock:/var/run/docker.sock`. With `--priviledged` you gain access to upper layer operation system. With mounting `/var/run/docker.sock` you still get access to all other docker images.
+
 Build:
 
     docker build --rm --force-rm -t mwaeckerlin/dockindock .
 
 Run:
+
   1. run the docker container that contains sub docker containers:
 
         docker run -d --privileged --name dockindock -p 80:80 mwaeckerlin/dockindock

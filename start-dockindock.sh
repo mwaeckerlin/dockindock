@@ -157,12 +157,12 @@ done
 
 if ! test -e /var/run/docker.sock; then
     if which cgroups-mount; then
-        cgroups-mount;
-        success "mount cgroups"
+        run cgroups-mount
     fi;
+    containerd &
     if test $foreground -eq 1; then
         message "starting docker damon in foreground"
-        dockerd
+        run dockerd
     else
         dockerd &
         success "docker started in background"
