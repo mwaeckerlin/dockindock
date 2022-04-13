@@ -1,0 +1,7 @@
+version: '3.7'
+services:
+  dockindock:
+    image: mwaeckerlin/dockindock
+    build: .
+    privileged: true
+    
