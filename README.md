@@ -1,9 +1,6 @@
-Docker in Docker
-================
+# Rootless Docker in Docker
 
-Docker image to run docker in docker. Use mwaeckerlin/reverse-proxy
-for reverse proxy to forward requests from outside do contained docker
-instances.
+Docker image to run docker in docker as non root user.
 
 Note: The image must be started with option `--privileged`.
 
@@ -11,7 +8,7 @@ Be aware: With `--priviledged` you gain access to upper layer operation system.
 
 Run:
 
-      docker-compose up
+      docker-compose up --build
 
 Run docker container in docker container:
 

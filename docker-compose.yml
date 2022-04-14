@@ -4,4 +4,3 @@ services:
     image: mwaeckerlin/dockindock
     build: .
     privileged: true
-    
