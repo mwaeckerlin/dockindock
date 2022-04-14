@@ -4,7 +4,7 @@ Docker image to run docker in docker as non root user.
 
 Note: The image must be started with option `--privileged`.
 
-Be aware: With `--priviledged` you gain access to upper layer operation system.
+Be aware: With `--privileged` you gain access to upper layer operation system.
 
 Run:
 
