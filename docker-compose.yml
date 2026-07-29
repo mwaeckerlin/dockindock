@@ -1,6 +1,13 @@
-version: '3.7'
 services:
   dockindock:
     image: mwaeckerlin/dockindock
     build: .
     privileged: true
+    # a volume on the data root is required: without it the inner overlay
+    # mounts would sit on the container's own overlayfs (overlay-on-overlay
+    # is rejected by the kernel)
+    volumes:
+      - dockindock-data:/docker-data
+
+volumes:
+  dockindock-data:

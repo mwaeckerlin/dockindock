@@ -1,0 +1,14 @@
+{
+  "name": "@mwaeckerlin/dockindock",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "docker compose build",
+    "start": "docker compose up --build --force-recreate --remove-orphans",
+    "start:daemon": "docker compose up -d --build --force-recreate --remove-orphans",
+    "stop": "docker compose down",
+    "test": "npm run test:docs && npm run test:config && npm run test:e2e",
+    "test:docs": "bash tests/docs-contract.sh",
+    "test:config": "npm run build && bash tests/config-contract.sh mwaeckerlin/dockindock",
+    "test:e2e": "bash tests/run-e2e.sh"
+  }
+}

@@ -1,0 +1,29 @@
+# Features
+
+Numbered register of every end-user visible feature; a number is never
+reused. Every feature is covered by tests listed in [TESTS.md](TESTS.md);
+the guard `tests/docs-contract.sh` fails when a feature has no test.
+
+- **F1 — Rootless docker daemon in a container.** The image starts a
+  complete docker daemon as an unprivileged user (rootless mode with
+  subordinate uid/gid ranges and slirp4netns networking) — root inside the
+  container is never needed, and no host configuration (AppArmor profile,
+  sysctl) is required. The container itself must be started with
+  `--privileged` (see the trade-off notes in the README).
+- **F2 — Run containers inside the container.** Images can be pulled and
+  containers run inside the inner daemon — full docker-in-docker for CI
+  jobs, sandboxes and nested tooling.
+- **F3 — Preconfigured client environment.** The docker CLI ships with the
+  image and works out of the box: `DOCKER_HOST` points to the rootless
+  socket and the toolchain directory is on the `PATH`, so `docker …` works
+  without any setup.
+- **F4 — Persistent storage.** The daemon stores images and containers in
+  the dedicated directory `/docker-data` (env `DOCKER_DATA_ROOT`) — always
+  mount a named volume there: inner images survive restarts, the inner
+  overlay mounts stay off the container's own overlayfs, and the toolchain
+  is never masked.
+- **F5 — Optional network endpoint.** Setting `DOCKER_TCP_PORT` publishes
+  the docker API on `tcp://0.0.0.0:<port>` (forwarded through the rootless
+  network namespace), so the image can serve as a shared docker-in-docker
+  service for sibling containers (e.g. the hermes and openclaw sandboxes).
+  Invalid values for these options abort startup with a clear error.

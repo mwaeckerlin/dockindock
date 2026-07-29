@@ -1,0 +1,31 @@
+# E2E stack: the shipped image started privileged (rootless docker needs the
+# unshare/namespace privileges), then exercised from outside via exec.
+# Deliberately no host prerequisites: the suite proves the image runs on a
+# stock host (no AppArmor profile, no sysctl change).
+name: dockindock-e2e
+
+services:
+  dockindock:
+    image: mwaeckerlin/dockindock
+    build:
+      context: ../..
+    privileged: true
+    # a volume on the data root is required: without it the inner overlay
+    # mounts would sit on the container's own overlayfs (overlay-on-overlay
+    # is rejected by the kernel)
+    volumes:
+      - dockindock-data:/docker-data
+
+  # same image as a network dind service: API published over plain TCP into
+  # the isolated test network, storage on a named volume
+  dind-tcp:
+    image: mwaeckerlin/dockindock
+    privileged: true
+    environment:
+      DOCKER_TCP_PORT: "2375"
+    volumes:
+      - dind-tcp-data:/docker-data
+
+volumes:
+  dockindock-data:
+  dind-tcp-data:
