@@ -11,6 +11,8 @@ The suite starts a real privileged container and exercises it with `docker exec`
 - **F3** `tests/run-e2e.sh` › client_env_preconfigured — `docker version` succeeds with the shipped default environment.
 - **F4** `tests/run-e2e.sh` › data_root_effective — the running daemon really stores under `/docker-data`.
 - **F5** `tests/run-e2e.sh` › tcp_endpoint_reachable — a second daemon with `DOCKER_TCP_PORT` answers the API over the container network.
+- **F7** `tests/run-e2e.sh` › daemon_options_applied — a daemon given `--registry-mirror` and `--insecure-registry` as its command lists the mirror in `docker info`.
+- **F7** `tests/run-e2e.sh` › pull_through_mirror — a pull in that daemon succeeds and appears in the request log of the pull-through cache in the stack (docker falls back to Docker Hub silently, so the pull alone proves nothing).
 
 ## Image contract
 
@@ -19,6 +21,9 @@ The suite starts a real privileged container and exercises it with `docker exec`
 - **F3** `tests/config-contract.sh` › docker_client, docker_host_env — the client binary runs and `DOCKER_HOST` is preconfigured.
 - **F4** `tests/config-contract.sh` › data_dir_writable — `/docker-data` exists and is writable for the daemon user.
 - **F5** `tests/config-contract.sh` › invalid_tcp_port_rejected, invalid_data_root_rejected — malformed option values abort startup with a clear error (negative checks).
+- **F7** `tests/config-contract.sh` › owned_data_root_option_rejected, owned_host_option_rejected — `--data-root` and `-H` given as options abort startup and name the setting to use instead (negative checks).
+- **F7** `tests/config-contract.sh` › misspelt_option_stops_daemon — a misspelt option stops the daemon with an error naming the option (negative check).
+- **F7** `tests/config-contract.sh` › command_runs_unchanged — a command that is no option runs unchanged, as images built on this one need.
 
 ## Workflow contract
 

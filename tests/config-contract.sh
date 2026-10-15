@@ -80,6 +80,36 @@ else
     else
         _fail "${IMAGE}_invalid_data_root_rejected" "bad data root not rejected: ${OUT}"
     fi
+
+    # additional daemon options come as the command; the options the image
+    # sets from its own variables must not be given a second way
+    OUT=$(docker run --rm --pull=never "${IMAGE}" --data-root=/elsewhere 2>&1)
+    if [[ $? -ne 0 && "${OUT}" == *"set DOCKER_DATA_ROOT instead"* ]]; then
+        _pass "${IMAGE}_owned_data_root_option_rejected"
+    else
+        _fail "${IMAGE}_owned_data_root_option_rejected" "--data-root not rejected: ${OUT}"
+    fi
+    OUT=$(docker run --rm --pull=never "${IMAGE}" -H tcp://0.0.0.0:2376 2>&1)
+    if [[ $? -ne 0 && "${OUT}" == *"set DOCKER_TCP_PORT instead"* ]]; then
+        _pass "${IMAGE}_owned_host_option_rejected"
+    else
+        _fail "${IMAGE}_owned_host_option_rejected" "-H not rejected: ${OUT}"
+    fi
+    # a misspelt option reaches the daemon, which refuses it by name and stops
+    OUT=$(docker run --rm --pull=never --privileged "${IMAGE}" --registry-mirrror=http://mirror:5000 2>&1)
+    if [[ $? -ne 0 && "${OUT}" == *"unknown flag: --registry-mirrror"* ]]; then
+        _pass "${IMAGE}_misspelt_option_stops_daemon"
+    else
+        _fail "${IMAGE}_misspelt_option_stops_daemon" "misspelt option not refused: ${OUT}"
+    fi
+    # a command that is no option runs unchanged, as before: derived images
+    # (mwaeckerlin/vscode) start the daemon from a CMD of their own
+    OUT=$(docker run --rm --pull=never "${IMAGE}" /bin/sh -c 'echo COMMAND-OK' 2>&1)
+    if [[ "${OUT}" == "COMMAND-OK" ]]; then
+        _pass "${IMAGE}_command_runs_unchanged"
+    else
+        _fail "${IMAGE}_command_runs_unchanged" "command not run as given: ${OUT}"
+    fi
 fi
 
 echo ""

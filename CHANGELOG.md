@@ -1,5 +1,9 @@
 # Changelog
 
+- 2026-10-15 **1.0.2**
+    - New: additional options for the inner docker daemon, given as the container command — for example a registry mirror, so the inner daemon no longer pulls from Docker Hub anonymously; options that would override `DOCKER_DATA_ROOT` or `DOCKER_TCP_PORT` abort startup with a clear error
+    - A command that is no option still runs unchanged, so derived images such as `mwaeckerlin/vscode` keep working
+
 - 2026-09-26 **1.0.1**
     - The image is published for amd64 and arm64 under one tag, built and published automatically on every change and every week
 

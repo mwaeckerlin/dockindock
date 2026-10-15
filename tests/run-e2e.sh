@@ -24,7 +24,7 @@ echo "==> Building test stack..."
 docker compose -f "$COMPOSE" build --quiet
 
 echo "==> Starting rootless docker daemons (privileged)..."
-docker compose -f "$COMPOSE" up -d dockindock dind-tcp
+docker compose -f "$COMPOSE" up -d dockindock dind-tcp dind-mirror mirror
 
 echo "==> Waiting for the daemon to answer..."
 DEADLINE=$((SECONDS + 90))
@@ -81,11 +81,39 @@ if [[ ${READY} -eq 1 ]]; then
     fi
 fi
 
+# dind-mirror gets its daemon options as the compose command; the daemon
+# must know the mirror, and a pull must reach the mirror — docker falls back
+# to Docker Hub silently when a mirror fails, so a successful pull alone
+# proves nothing and the mirror's own request log is the evidence
+MIRROR_DEADLINE=$((SECONDS + 90))
+MIRRORS=""
+while [[ ${SECONDS} -lt ${MIRROR_DEADLINE} ]]; do
+    MIRRORS=$(docker compose -f "$COMPOSE" exec -T dind-mirror docker info --format '{{json .RegistryConfig.Mirrors}}' 2>&1)
+    if [[ $? -eq 0 ]]; then
+        break
+    fi
+    sleep 2
+done
+if echo "${MIRRORS}" | grep -q '"http://mirror:5000/"'; then
+    _pass "daemon_options_applied"
+else
+    _fail "daemon_options_applied" "inner daemon does not list the mirror: ${MIRRORS}"
+    docker compose -f "$COMPOSE" logs --tail 50 dind-mirror
+fi
+
+PULL=$(docker compose -f "$COMPOSE" exec -T dind-mirror docker pull alpine 2>&1)
+MIRROR_LOG=$(docker compose -f "$COMPOSE" logs mirror 2>&1)
+if echo "${PULL}" | grep -q "docker.io/library/alpine" && echo "${MIRROR_LOG}" | grep -q "/v2/library/alpine/manifests/"; then
+    _pass "pull_through_mirror"
+else
+    _fail "pull_through_mirror" "pull did not go through the mirror: ${PULL}"
+fi
+
 echo ""
 echo "==> E2E results: ${PASS} passed, ${FAIL} failed"
 if [[ ${FAIL} -gt 0 ]]; then
     echo "==> Failed: ${FAILED_NAMES[*]}"
     echo "==> Collecting logs on failure..."
-    docker compose -f "$COMPOSE" logs --tail 60 dockindock dind-tcp
+    docker compose -f "$COMPOSE" logs --tail 60 dockindock dind-tcp dind-mirror mirror
     exit 1
 fi

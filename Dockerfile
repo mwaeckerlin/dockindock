@@ -41,5 +41,7 @@ USER root
 # guaranteed to survive into the shipped image.
 RUN setcap cap_sys_admin+ep ${XDG_RUNTIME_DIR}/bin/rootlesskit
 USER ${RUN_USER}
-CMD ["/entrypoint.sh"]
+# the arguments are additional daemon options or a command of their own
+# (see files/entrypoint.sh); without any, the daemon starts as configured
+ENTRYPOINT ["/entrypoint.sh"]
 WORKDIR /home/${RUN_USER}
